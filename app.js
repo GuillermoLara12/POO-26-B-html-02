@@ -20,6 +20,10 @@ const btnAprobados = document.getElementById("btn-aprobados");
 const btnTodos = document.getElementById("btn-todos");
 const btnReprobados = document.getElementById("btn-reprobados");
 const btnPromedio = document.getElementById("btn-promedio");
+const seccionPromedio = document.getElementById("resultado-promedio");
+const btnAceptar = document.getElementById("btn-agregar");
+const inputnombre = document.getElementById("input-nombre");
+const inputnota = document.getElementById("input-nota");
 
 // Funciones
 const crearTarjeta = (unEstudiante) => {
@@ -46,6 +50,12 @@ const renderizarLista = (estudiantesApintar) => {
     sectionEstudiantes.innerHTML = listaTarjetas.join("");
 }
 
+const toFixedTrunc = (num, decimales) => {
+    const factor = Math.pow(10, decimales);
+    const truncado = Math.trunc(num * factor) / factor;
+    return truncado.toFixed(decimales);
+}
+
 //Eventos
 btnTodos.addEventListener('click', () => {
         renderizarLista(estudiantes);
@@ -58,7 +68,7 @@ btnTodos.addEventListener(
                 return unEstudiante.nota;
             }
         );
-        renderizarLista(aprobados);
+        renderizarLista(todos);
     }
 )
 
@@ -87,6 +97,41 @@ btnReprobados.addEventListener(
         renderizarLista(reprobados);
     }
 )
+
+btnPromedio.addEventListener('click', () => {
+    const sumaNotas = estudiantes.reduce(
+        (valorPersistente, estudiantes) => {
+            return valorPersistente + estudiantes.nota
+    },
+    0);
+    const Promedio = sumaNotas / estudiantes.length;
+    console.log(toFixedTrunc(Promedio, 2));
+    seccionPromedio.innerHTML = "Promedio: " + toFixedTrunc(Promedio, 2);
+    seccionPromedio.style.display = "block";
+});
+
+btnAceptar.addEventListener('click', () => {
+    const nombre = inputnombre.value.trim();
+    const nota = parseInt(inputnota.value.trim());
+
+    if (nombre === "" || isNaN(nota) || nota < 0 || nota > 100) {
+        alert("Porfavor, ingresa un nombre o nota valido");
+        return;
+    }
+
+    const nuevoEstudiante = {
+        id: estudiantes.length + 1,
+        nombre: nombre,
+        nota: nota
+    };
+
+    estudiantes.push(nuevoEstudiante);
+    renderizarLista(estudiantes);
+
+    inputnombre.value = "";
+    inputnota.value = "";
+
+});
 
 //Llamada
 renderizarLista(estudiantes);
